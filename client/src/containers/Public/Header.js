@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import logo from "../../assets/logowithoutbg.png";
+import logo from "../../assets/logowithoutbg.svg";
 import { Button, User } from "../../components";
 import icons from "../../ultils/icons";
 import { path } from "../../ultils/constant";
@@ -30,7 +30,8 @@ const Header = () => {
   const resolvedRole = currentData?.role || storedRole;
   const isAdmin = isAdminRole(resolvedRole);
   const menuItems = getMenuManage(resolvedRole);
-  const isHydratingUser = (isLoadingCurrent || !isCurrentResolved) && !currentData?.id;
+  const isHydratingUser =
+    (isLoadingCurrent || !isCurrentResolved) && !currentData?.id;
 
   const goLogin = useCallback(
     (flag, fromPath) => {
@@ -104,7 +105,11 @@ const Header = () => {
           className="flex items-center gap-3"
           onClick={(event) => {
             // Same-route click should still scroll to the very top.
-            if (location.pathname === "/" && !location.search && !location.hash) {
+            if (
+              location.pathname === "/" &&
+              !location.search &&
+              !location.hash
+            ) {
               event.preventDefault();
               scrollToTop("smooth");
             }
@@ -112,8 +117,8 @@ const Header = () => {
         >
           <img
             src={logo}
-            alt="Phongtro123"
-            className="h-10 w-[168px] object-contain sm:h-11 sm:w-[176px]"
+            alt="TroMoi logo"
+            className="h-16 w-32 object-cover"
           />
         </Link>
 
@@ -140,7 +145,7 @@ const Header = () => {
           {!isLoggedIn && !isAuthRoute && (
             <>
               <span className="hidden text-sm font-medium text-slate-500 lg:block">
-                Phongtro123.com xin chào
+                TroMoi.com xin chào
               </span>
               <Button
                 text="Đăng nhập"
@@ -183,7 +188,9 @@ const Header = () => {
                     </p>
                     <div className="mt-2 flex items-center gap-2">
                       <p className="truncate text-sm font-semibold text-slate-950">
-                        {isHydratingUser ? "Đang đồng bộ..." : currentData?.name || "Tài khoản"}
+                        {isHydratingUser
+                          ? "Đang đồng bộ..."
+                          : currentData?.name || "Tài khoản"}
                       </p>
                       {isAdmin && (
                         <span className="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-700">

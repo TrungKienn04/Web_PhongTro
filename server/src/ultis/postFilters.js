@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+import { Op } from "sequelize";
 
 const toArray = (value) => {
   if (value === undefined || value === null) return [];
@@ -6,7 +6,9 @@ const toArray = (value) => {
 };
 
 const compactValues = (values = []) =>
-  values.filter((value) => value !== undefined && value !== null && value !== "");
+  values.filter(
+    (value) => value !== undefined && value !== null && value !== "",
+  );
 
 const parseNumberRange = (value) => {
   const values = compactValues(toArray(value))
@@ -16,7 +18,7 @@ const parseNumberRange = (value) => {
   if (!values.length) return null;
   if (values.length === 1) return values[0];
 
-  const [min, max] = values.sort((left, right) => left - right);
+  const [min, max] = values.sort((a, b) => a - b);
   return { [Op.between]: [min, max] };
 };
 
@@ -44,29 +46,20 @@ const normalizePostFilterQuery = (rawQuery = {}) => {
   const page = Array.isArray(normalized.page)
     ? normalized.page[0]
     : normalized.page;
+
   const sort = Array.isArray(normalized.sort)
     ? normalized.sort[0]
     : normalized.sort;
 
-  const filters = {
-    ...normalized,
-  };
+  const filters = { ...normalized };
 
   delete filters.page;
   delete filters.sort;
 
-  if (filters.priceNumber) {
-    delete filters.priceCode;
-  }
-  if (filters.areaNumber) {
-    delete filters.areaCode;
-  }
+  if (filters.priceNumber) delete filters.priceCode;
+  if (filters.areaNumber) delete filters.areaCode;
 
-  return {
-    page,
-    sort,
-    filters,
-  };
+  return { page, sort, filters };
 };
 
 const buildPostWhereClause = (filters = {}) => {
@@ -86,7 +79,7 @@ const buildPostWhereClause = (filters = {}) => {
   return where;
 };
 
-module.exports = {
+export {
   buildPostWhereClause,
   normalizeListFilter,
   normalizePostFilterQuery,

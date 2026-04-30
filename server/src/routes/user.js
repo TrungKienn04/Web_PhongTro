@@ -1,9 +1,9 @@
-import express from "express";
-import verifyToken from "../middlewares/verifyToken";
-import uploadSinglePostImage from "../middlewares/uploadSinglePostImage";
-import { loadCurrentUser, requireActiveUser } from "../middlewares/authAccess";
-import { loadPost, requirePostOwner } from "../middlewares/postAccess";
-import * as userController from "../controllers/user";
+﻿import express from "express";
+import verifyToken from "../middlewares/verifyToken.js";
+import uploadSinglePostImage from "../middlewares/uploadSinglePostImage.js";
+import { loadCurrentUser, requireActiveUser } from "../middlewares/authAccess.js";
+import { loadPost, requirePostOwner } from "../middlewares/postAccess.js";
+import * as userController from "../controllers/user.js";
 
 const router = express.Router();
 
@@ -52,3 +52,4 @@ router.delete(
 );
 
 export default router;
+

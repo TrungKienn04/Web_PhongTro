@@ -1,48 +1,41 @@
-const fs = require("fs");
-const path = require("path");
-const mysql = require("mysql2/promise");
+const db = require("../src/models");
+
+const TABLES = [
+  "Users",
+  "Posts",
+  "Attributes",
+  "Images",
+  "Overviews",
+  "Prices",
+  "Areas",
+  "Provinces",
+  "Categories",
+  "Labels",
+  "SavedPosts",
+];
 
 async function check() {
   try {
-    const configPath = path.resolve(
-      __dirname,
-      "..",
-      "src",
-      "config",
-      "config.json",
-    );
-    const cfg = JSON.parse(fs.readFileSync(configPath, "utf8"));
-    const env = cfg.development;
-    const { username, password, database, host } = env;
+    await db.sequelize.authenticate();
+    console.log("Connected using current env-based Sequelize config.");
 
-    const conn = await mysql.createConnection({
-      host: host || "127.0.0.1",
-      user: username || "root",
-      password: password || "",
-      database,
-    });
-
-    const [tables] = await conn.query(
-      `SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?`,
-      [database],
-    );
-
-    console.log("Found tables in", database);
-    for (const row of tables) {
-      const t = row.TABLE_NAME;
+    for (const table of TABLES) {
       try {
-        const [res] = await conn.query(`SELECT COUNT(*) as c FROM \`${t}\``);
-        console.log(`${t}:`, res[0].c);
-      } catch (e) {
-        console.warn(`${t}: count failed:`, e && e.message);
+        const [rows] = await db.sequelize.query(
+          `SELECT COUNT(*)::int AS count FROM "${table}"`,
+        );
+        console.log(`${table}: ${rows[0]?.count ?? 0}`);
+      } catch (error) {
+        console.warn(`${table}: count failed: ${error?.message || error}`);
       }
     }
 
-    await conn.end();
-    process.exit(0);
-  } catch (err) {
-    console.error("checkDb failed:", err && err.message);
-    process.exit(1);
+    process.exitCode = 0;
+  } catch (error) {
+    console.error("checkDb failed:", error?.message || error);
+    process.exitCode = 1;
+  } finally {
+    await db.sequelize.close();
   }
 }
 

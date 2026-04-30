@@ -1,12 +1,12 @@
-import * as postService from "../services/post";
-import * as userService from "../services/user";
+﻿import * as postService from "../services/post.js";
+import * as userService from "../services/user.js";
 
-const {
+import {
   parsePostStatus,
   normalizeUserStatus,
   POST_STATUSES,
   USER_STATUSES,
-} = require("../ultis/accessControl");
+} from "../ultis/accessControl.js";
 
 const normalizePage = (value) => {
   const parsed = Number(value);
@@ -24,7 +24,7 @@ export const getPosts = async (req, res) => {
       if (!normalizedStatus) {
         return res.status(400).json({
           err: 1,
-          msg: "Trạng thái bài đăng không hợp lệ.",
+          msg: "Tráº¡ng thÃ¡i bÃ i Ä‘Äƒng khÃ´ng há»£p lá»‡.",
           response: null,
         });
       }
@@ -56,7 +56,10 @@ export const getPosts = async (req, res) => {
 
 export const getPostById = async (req, res) => {
   try {
-    const response = await postService.getPostByIdService(req.params.id, req.user);
+    const response = await postService.getPostByIdService(
+      req.params.id,
+      req.user,
+    );
     return res.status(response?.err === 0 ? 200 : 404).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -68,12 +71,14 @@ export const getPostById = async (req, res) => {
 };
 
 export const updatePostStatus = async (req, res) => {
-  const nextStatus = String(req.body?.status || "").trim().toLowerCase();
+  const nextStatus = String(req.body?.status || "")
+    .trim()
+    .toLowerCase();
 
   if (!POST_STATUSES.includes(nextStatus)) {
     return res.status(400).json({
       err: 1,
-      msg: "Trạng thái bài đăng không hợp lệ.",
+      msg: "Tráº¡ng thÃ¡i bÃ i Ä‘Äƒng khÃ´ng há»£p lá»‡.",
       response: null,
     });
   }
@@ -151,12 +156,14 @@ export const getUserById = async (req, res) => {
 };
 
 export const updateUserStatus = async (req, res) => {
-  const nextStatus = String(req.body?.status || "").trim().toLowerCase();
+  const nextStatus = String(req.body?.status || "")
+    .trim()
+    .toLowerCase();
 
   if (!USER_STATUSES.includes(nextStatus)) {
     return res.status(400).json({
       err: 1,
-      msg: "Trạng thái tài khoản không hợp lệ.",
+      msg: "Tráº¡ng thÃ¡i tÃ i khoáº£n khÃ´ng há»£p lá»‡.",
       response: null,
     });
   }

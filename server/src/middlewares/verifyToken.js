@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
-
-const { normalizeRole } = require("../ultis/accessControl");
+import { normalizeRole } from "../ultis/accessControl.js";
 
 const readBearerToken = (headers = {}) => {
   const authorization = String(headers.authorization || "").trim();

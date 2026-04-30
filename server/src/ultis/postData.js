@@ -58,7 +58,7 @@ const normalizeDescription = (value) => {
   }
 };
 
-module.exports = {
+export {
   extractUrls,
   normalizeDescription,
   normalizeImageList,

@@ -1,10 +1,8 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 import fs from "fs";
-import { dataArea, dataPrice } from "../ultis/data";
+import { dataArea, dataPrice } from "../ultis/data.js";
 
-const {
-  derivePostPriceAreaCodes,
-} = require("../ultis/priceAreaCode");
+import { derivePostPriceAreaCodes } from "../ultis/priceAreaCode.js";
 
 const reportFile = "price_area_backfill_report.json";
 

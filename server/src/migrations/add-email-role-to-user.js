@@ -20,11 +20,13 @@ module.exports = {
       });
     }
 
-    await queryInterface.sequelize.query(`
-      UPDATE \`${tableName}\`
-      SET role = 'user'
-      WHERE role IS NULL OR role = ''
-    `);
+    await queryInterface.bulkUpdate(
+      tableName,
+      { role: "user" },
+      {
+        [Sequelize.Op.or]: [{ role: null }, { role: "" }],
+      },
+    );
 
     const indexes = await queryInterface.showIndex(tableName);
     const hasEmailUniqueIndex = indexes.some(

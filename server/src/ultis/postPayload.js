@@ -26,17 +26,17 @@ const validatePostPayload = (payload = {}) => {
   if (!payload.images?.length) return "Vui lòng tải lên ít nhất 1 ảnh.";
 
   if (
-    !payload.priceNumber
-    || Number.isNaN(payload.priceNumber)
-    || payload.priceNumber <= 0
+    !payload.priceNumber ||
+    Number.isNaN(payload.priceNumber) ||
+    payload.priceNumber <= 0
   ) {
     return "Giá cho thuê phải lớn hơn 0.";
   }
 
   if (
-    !payload.areaNumber
-    || Number.isNaN(payload.areaNumber)
-    || payload.areaNumber <= 0
+    !payload.areaNumber ||
+    Number.isNaN(payload.areaNumber) ||
+    payload.areaNumber <= 0
   ) {
     return "Diện tích phải lớn hơn 0.";
   }
@@ -52,7 +52,4 @@ const validatePostPayload = (payload = {}) => {
   return null;
 };
 
-module.exports = {
-  normalizePostPayload,
-  validatePostPayload,
-};
+export { normalizePostPayload, validatePostPayload };

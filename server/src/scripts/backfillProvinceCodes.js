@@ -1,11 +1,11 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 import fs from "fs";
-const {
+import {
   buildProvinceCodeUpdates,
   createProvinceCode,
   extractProvinceNameFromAddress,
   mergeProvinceCatalog,
-} = require("../ultis/provinceCode");
+} from "../ultis/provinceCode.js";
 
 const reportFile = "province_code_backfill_report.json";
 
@@ -32,7 +32,11 @@ async function main() {
     const provinceName = extractProvinceNameFromAddress(post.address);
     const provinceCode = createProvinceCode(provinceName);
 
-    if (!provinceName || !provinceCode || knownProvinceCodes.has(provinceCode)) {
+    if (
+      !provinceName ||
+      !provinceCode ||
+      knownProvinceCodes.has(provinceCode)
+    ) {
       return;
     }
 

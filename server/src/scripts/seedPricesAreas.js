@@ -1,5 +1,5 @@
-import '../models'
-import { createPricesAndAreas } from '../services/insert'
+﻿import '../models'
+import { createPricesAndAreas } from '../services/insert.js'
 
 const run = async () => {
   try {
@@ -13,3 +13,4 @@ const run = async () => {
 }
 
 run()
+

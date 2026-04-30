@@ -1,6 +1,6 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 
-const { isAdminRole } = require("../ultis/accessControl");
+import { isAdminRole } from "../ultis/accessControl.js";
 
 const resolvePostId = (req) => req.params?.postId || req.params?.id;
 

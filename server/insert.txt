@@ -105,3 +105,5 @@ Mật khẩu cần tối thiểu 6 ký tự.
 Ghi nhớ đăng nhập sau khi tạo tài khoản
 
 
+git checkout -b backup-phien-ban-loi ---cú pháp backup bản code lỗi khi migration sang postgres
+git commit -m "Lưu lại bản lỗi trước khi quay về MySQL"

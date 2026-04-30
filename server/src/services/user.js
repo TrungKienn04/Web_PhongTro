@@ -1,18 +1,17 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 
-require("dotenv").config();
-
-const {
+import "../config/loadEnv.cjs";
+import {
   ADMIN_ROLE,
   USER_ROLE,
   USER_STATUS_ACTIVE,
   USER_STATUS_BLOCKED,
   normalizeRole,
   normalizeUserStatus,
-} = require("../ultis/accessControl");
+} from "../ultis/accessControl.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PHONE_REGEX = /^0\d{8,10}$/;
@@ -22,7 +21,10 @@ const normalizePhone = (phone) =>
     .trim()
     .replace(/\s+/g, "");
 
-const normalizeEmail = (email) => String(email || "").trim().toLowerCase();
+const normalizeEmail = (email) =>
+  String(email || "")
+    .trim()
+    .toLowerCase();
 
 const hashPassword = (password) =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(12));
@@ -123,11 +125,14 @@ export const updateCurrentUser = (id, payload = {}) =>
         }),
         normalizedEmail
           ? db.User.findOne({
-            where: {
-              [Op.or]: [{ email: normalizedEmail }, { fbUrl: normalizedEmail }],
-            },
-            raw: true,
-          })
+              where: {
+                [Op.or]: [
+                  { email: normalizedEmail },
+                  { fbUrl: normalizedEmail },
+                ],
+              },
+              raw: true,
+            })
           : null,
       ]);
 
@@ -159,7 +164,10 @@ export const updateCurrentUser = (id, payload = {}) =>
           });
         }
 
-        if (!currentPassword || !bcrypt.compareSync(currentPassword, user.password)) {
+        if (
+          !currentPassword ||
+          !bcrypt.compareSync(currentPassword, user.password)
+        ) {
           return resolve({
             err: 1,
             msg: "Mat khau hien tai khong dung.",
@@ -269,8 +277,7 @@ export const updateUserStatus = (userId, payload = {}) =>
       user.status = nextStatus;
       user.blockedReason =
         nextStatus === USER_STATUS_BLOCKED ? blockedReason || null : null;
-      user.blockedAt =
-        nextStatus === USER_STATUS_BLOCKED ? new Date() : null;
+      user.blockedAt = nextStatus === USER_STATUS_BLOCKED ? new Date() : null;
 
       await user.save();
 

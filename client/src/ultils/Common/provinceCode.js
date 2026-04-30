@@ -21,19 +21,20 @@ const SPECIAL_CODES = [
 ];
 
 export const normalizeProvinceText = (value = "") =>
-  value
-    .toString()
+  String(value || "")
     .trim()
     .toLowerCase()
+    .replace(/[\u0111\u0110]/g, "d")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
     .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
 export const stripProvincePrefix = (value = "") =>
-  String(value || "").replace(/^(Thành phố|Tỉnh)\s+/i, "").trim();
+  String(value || "")
+    .replace(/^(thành phố|tỉnh)\s+/iu, "")
+    .trim();
 
 export const createProvinceCode = (value = "") =>
   normalizeProvinceText(value).replace(/\s+/g, "").toUpperCase();
@@ -46,9 +47,9 @@ export const resolveProvinceCode = (value = "") => {
     aliases.some((alias) => {
       const normalizedAlias = normalizeProvinceText(alias);
       return (
-        normalized === normalizedAlias
-        || normalized.includes(normalizedAlias)
-        || condensed === normalizedAlias.replace(/\s+/g, "")
+        normalized === normalizedAlias ||
+        normalized.includes(normalizedAlias) ||
+        condensed === normalizedAlias.replace(/\s+/g, "")
       );
     }),
   );

@@ -1,17 +1,16 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 import { v4 } from "uuid";
 
-require("dotenv").config();
-
-const {
+import "../config/loadEnv.cjs";
+import {
   USER_ROLE,
   USER_STATUS_ACTIVE,
   isBlockedUserStatus,
   normalizeRole,
-} = require("../ultis/accessControl");
+} from "../ultis/accessControl.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 
@@ -20,7 +19,10 @@ const normalizePhone = (phone) =>
     .trim()
     .replace(/\s+/g, "");
 
-const normalizeEmail = (email) => String(email || "").trim().toLowerCase();
+const normalizeEmail = (email) =>
+  String(email || "")
+    .trim()
+    .toLowerCase();
 
 const isEmailIdentifier = (value) => EMAIL_REGEX.test(normalizeEmail(value));
 

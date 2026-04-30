@@ -1,6 +1,6 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 import fs from "fs";
-const { extractUrls, normalizeImageList } = require("../ultis/postData");
+import { extractUrls, normalizeImageList } from "../ultis/postData.js";
 
 // Script to repair Images.image fields that may contain truncated/malformed JSON strings.
 // Usage (dev): npx babel-node src/scripts/repairImages.js

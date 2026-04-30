@@ -1,5 +1,5 @@
-import express from 'express'
-import * as controllers from '../controllers/province'
+﻿import express from 'express'
+import * as controllers from '../controllers/province.js'
 // CRUD
 const router = express.Router()
 

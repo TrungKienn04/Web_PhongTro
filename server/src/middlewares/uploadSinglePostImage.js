@@ -1,4 +1,4 @@
-import upload from "./uploadPostImages";
+﻿import upload from "./uploadPostImages.js";
 
 const uploadSinglePostImage = (req, res, next) => {
   const handler = upload.single("file");
@@ -21,3 +21,4 @@ const uploadSinglePostImage = (req, res, next) => {
 };
 
 export default uploadSinglePostImage;
+

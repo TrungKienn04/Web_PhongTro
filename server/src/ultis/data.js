@@ -1,44 +1,44 @@
-import generateCode from "./generateCode"
+﻿import generateCode from "./generateCode.js"
 const prices = [
     {
         min: 0,
         max: 1,
-        value: 'Dưới 1 triệu',
+        value: 'DÆ°á»›i 1 triá»‡u',
     },
     {
         min: 1,
         max: 2,
-        value: 'Từ 1 - 2 triệu',
+        value: 'Tá»« 1 - 2 triá»‡u',
     },
     {
         min: 2,
         max: 3,
-        value: 'Từ 2 - 3 triệu',
+        value: 'Tá»« 2 - 3 triá»‡u',
     },
     {
         min: 3,
         max: 5,
-        value: 'Từ 3 - 5 triệu',
+        value: 'Tá»« 3 - 5 triá»‡u',
     },
     {
         min: 5,
         max: 7,
-        value: 'Từ 5 - 7 triệu',
+        value: 'Tá»« 5 - 7 triá»‡u',
     },
     {
         min: 7,
         max: 10,
-        value: 'Từ 7 - 10 triệu',
+        value: 'Tá»« 7 - 10 triá»‡u',
     },
     {
         min: 10,
         max: 15,
-        value: 'Từ 10 - 15 triệu',
+        value: 'Tá»« 10 - 15 triá»‡u',
     },
     {
         min: 15,
         max: 999999,
-        value: 'Trên 15 triệu'
+        value: 'TrÃªn 15 triá»‡u'
     },
 ]
 
@@ -46,32 +46,32 @@ const areas = [
     {
         min: 0,
         max: 20,
-        value: 'Dưới 20m'
+        value: 'DÆ°á»›i 20m'
     },
     {
         min: 20,
         max: 30,
-        value: 'Từ 20m - 30m'
+        value: 'Tá»« 20m - 30m'
     },
     {
         min: 30,
         max: 50,
-        value: 'Từ 30m - 50m'
+        value: 'Tá»« 30m - 50m'
     },
     {
         min: 50,
         max: 70,
-        value: 'Từ 50m - 70m'
+        value: 'Tá»« 50m - 70m'
     },
     {
         min: 70,
         max: 90,
-        value: 'Từ 70m - 90m'
+        value: 'Tá»« 70m - 90m'
     },
     {
         min: 90,
         max: 9999999,
-        value: 'Trên 90m'
+        value: 'TrÃªn 90m'
     },
 ]
 
@@ -83,6 +83,7 @@ export const dataArea = areas.map(item => ({
     ...item,
     code: generateCode(item.value),
 }))
+
 
 
 

@@ -1,5 +1,5 @@
-import express from 'express'
-import * as inserController from '../controllers/insert'
+﻿import express from 'express'
+import * as inserController from '../controllers/insert.js'
 
 
 const router = express.Router()

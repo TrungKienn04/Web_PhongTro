@@ -1,11 +1,10 @@
-import * as postService from "../services/post";
-
-const { normalizePostFilterQuery } = require("../ultis/postFilters");
-const {
+﻿import * as postService from "../services/post.js";
+import { normalizePostFilterQuery } from "../ultis/postFilters.js";
+import {
   normalizePostPayload,
   validatePostPayload,
-} = require("../ultis/postPayload");
-const { isAdminRole, parsePostStatus } = require("../ultis/accessControl");
+} from "../ultis/postPayload.js";
+import { isAdminRole, parsePostStatus } from "../ultis/accessControl.js";
 
 const normalizePage = (value) => {
   const parsed = Number(value);
@@ -82,7 +81,7 @@ export const createNewPost = async (req, res) => {
     if (!categoryCode || !id || !title || !priceNumber || !areaNumber) {
       return res.status(400).json({
         err: 1,
-        msg: "Thiếu dữ liệu đầu vào.",
+        msg: "Thiáº¿u dá»¯ liá»‡u Ä‘áº§u vÃ o.",
         response: null,
       });
     }
@@ -96,7 +95,10 @@ export const createNewPost = async (req, res) => {
       });
     }
 
-    const response = await postService.createNewPostService(normalizedPayload, id);
+    const response = await postService.createNewPostService(
+      normalizedPayload,
+      id,
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -121,7 +123,7 @@ export const getPostsByCurrentUser = async (req, res) => {
       if (!normalizedStatus) {
         return res.status(400).json({
           err: 1,
-          msg: "Trạng thái bài đăng không hợp lệ.",
+          msg: "Tráº¡ng thÃ¡i bÃ i Ä‘Äƒng khÃ´ng há»£p lá»‡.",
           response: null,
         });
       }
@@ -145,8 +147,8 @@ export const getPostsByCurrentUser = async (req, res) => {
           limit: req.query?.limit,
         })
       : await postService.getPostsByUserService(id, {
-        status: normalizedStatus,
-        page: normalizePage(req.query?.page),
+          status: normalizedStatus,
+          page: normalizePage(req.query?.page),
           limit: req.query?.limit,
         });
 
@@ -169,7 +171,7 @@ export const updatePost = async (req, res) => {
     if (!categoryCode || !id || !title || !priceNumber || !areaNumber) {
       return res.status(400).json({
         err: 1,
-        msg: "Thiếu dữ liệu đầu vào.",
+        msg: "Thiáº¿u dá»¯ liá»‡u Ä‘áº§u vÃ o.",
         response: null,
       });
     }
@@ -220,7 +222,7 @@ export const uploadImage = async (req, res) => {
     if (!req.file?.filename) {
       return res.status(400).json({
         err: 1,
-        msg: "Không nhận được tệp ảnh hợp lệ.",
+        msg: "KhÃ´ng nháº­n Ä‘Æ°á»£c tá»‡p áº£nh há»£p lá»‡.",
         response: null,
       });
     }

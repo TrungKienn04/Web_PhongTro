@@ -11,13 +11,12 @@ const EXTRA_PROVINCE_ALIASES = {
 };
 
 const normalizeText = (value = "") =>
-  value
-    .toString()
+  String(value || "")
     .trim()
     .toLowerCase()
+    .replace(/[\u0111\u0110]/g, "d")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
     .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -26,10 +25,12 @@ const createProvinceCode = (value = "") =>
   normalizeText(value).replace(/\s+/g, "").toUpperCase();
 
 const stripAdministrativePrefix = (value = "") =>
-  value.replace(/^(thanh pho|tp|tinh)\s+/i, "").trim();
+  String(value || "")
+    .replace(/^(thành phố|tp\.?|tỉnh)\s+/iu, "")
+    .trim();
 
 const extractProvinceNameFromAddress = (address = "") => {
-  const segments = address
+  const segments = String(address || "")
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
@@ -135,7 +136,7 @@ const buildProvinceCodeUpdates = (posts = [], provinces = []) => {
   return { updates, unmatched };
 };
 
-module.exports = {
+export {
   createProvinceCode,
   DEFAULT_PROVINCES,
   extractProvinceNameFromAddress,

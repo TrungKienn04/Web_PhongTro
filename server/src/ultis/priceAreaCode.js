@@ -139,7 +139,9 @@ const resolveRangeCode = (value, catalog = []) => {
     (left, right) => (left.order || 0) - (right.order || 0),
   );
 
-  const match = sortedCatalog.find((item) => isWithinRange(value, getCatalogRange(item)));
+  const match = sortedCatalog.find((item) =>
+    isWithinRange(value, getCatalogRange(item)),
+  );
 
   return match?.code || null;
 };
@@ -181,7 +183,7 @@ const derivePostPriceAreaCodes = ({
   };
 };
 
-module.exports = {
+export {
   derivePostPriceAreaCodes,
   formatAreaAttribute,
   formatPriceAttribute,

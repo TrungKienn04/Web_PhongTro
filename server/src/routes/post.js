@@ -1,9 +1,9 @@
-import express from "express";
-import * as postController from "../controllers/post";
-import verifyToken, { attachUserIfPresent } from "../middlewares/verifyToken";
-import uploadSinglePostImage from "../middlewares/uploadSinglePostImage";
-import { loadCurrentUser, requireActiveUser } from "../middlewares/authAccess";
-import { loadPost, requirePostOwner } from "../middlewares/postAccess";
+﻿import express from "express";
+import * as postController from "../controllers/post.js";
+import verifyToken, { attachUserIfPresent } from "../middlewares/verifyToken.js";
+import uploadSinglePostImage from "../middlewares/uploadSinglePostImage.js";
+import { loadCurrentUser, requireActiveUser } from "../middlewares/authAccess.js";
+import { loadPost, requirePostOwner } from "../middlewares/postAccess.js";
 
 const router = express.Router();
 
@@ -49,3 +49,4 @@ router.delete(
 router.get("/:id", attachUserIfPresent, postController.getPostById);
 
 export default router;
+

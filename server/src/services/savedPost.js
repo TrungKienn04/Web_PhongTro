@@ -1,7 +1,10 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 
-const { POST_STATUS_PUBLISHED, normalizePostStatus } = require("../ultis/accessControl");
-const { normalizeImageList, normalizeDescription } = require("../ultis/postData");
+import {
+  POST_STATUS_PUBLISHED,
+  normalizePostStatus,
+} from "../ultis/accessControl.js";
+import { normalizeImageList, normalizeDescription } from "../ultis/postData.js";
 
 const mapUserResponse = (user) => {
   if (!user) return user;

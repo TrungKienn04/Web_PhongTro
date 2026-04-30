@@ -1,10 +1,10 @@
-import db from "../models";
+﻿import db from "../models/index.js";
 
-const {
+import {
   isBlockedUserStatus,
   normalizeRole,
   normalizeUserStatus,
-} = require("../ultis/accessControl");
+} from "../ultis/accessControl.js";
 
 export const loadCurrentUser = async (req, res, next) => {
   try {

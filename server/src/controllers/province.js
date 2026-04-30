@@ -1,4 +1,4 @@
-import * as services from '../services/province'
+﻿import * as services from '../services/province.js'
 
 export const getProvinces = async (req, res) => {
     try {

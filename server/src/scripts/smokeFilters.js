@@ -1,5 +1,5 @@
-const fs = require("fs");
-const { resolveProvinceCodeFromAddress } = require("../ultis/provinceCode");
+import fs from "fs";
+import { resolveProvinceCodeFromAddress } from "../ultis/provinceCode.js";
 
 const BASE_URL = process.env.SMOKE_BASE_URL || "http://localhost:5000/api/v1";
 const outputFile = "filter_smoke_report.json";
@@ -70,7 +70,12 @@ async function main() {
             const rows = json?.response?.rows || [];
             const count = json?.response?.count;
 
-            if (!Array.isArray(rows) || typeof count !== "number" || rows.length > 5 || count < rows.length) {
+            if (
+              !Array.isArray(rows) ||
+              typeof count !== "number" ||
+              rows.length > 5 ||
+              count < rows.length
+            ) {
               failures.push({
                 type: "shape",
                 path,
@@ -83,7 +88,8 @@ async function main() {
             if (provinceCode && rows.length) {
               const provinceMatch = rows.every(
                 (row) =>
-                  resolveProvinceCodeFromAddress(row.address, provinces) === provinceCode,
+                  resolveProvinceCodeFromAddress(row.address, provinces) ===
+                  provinceCode,
               );
 
               if (!provinceMatch) {
@@ -102,7 +108,11 @@ async function main() {
               const detail = await fetchJson(`/post/${rows[0].id}`);
               detailChecked += 1;
 
-              if (detail.status !== 200 || detail.json?.err !== 0 || detail.json?.response?.id !== rows[0].id) {
+              if (
+                detail.status !== 200 ||
+                detail.json?.err !== 0 ||
+                detail.json?.response?.id !== rows[0].id
+              ) {
                 failures.push({
                   type: "detail",
                   path,
@@ -119,9 +129,18 @@ async function main() {
   }
 
   const representativeRanges = [
-    { priceNumber: parseRangeFromLabel("Từ 1 - 2 triệu"), areaNumber: parseRangeFromLabel("Từ 20m - 30m") },
-    { priceNumber: parseRangeFromLabel("Từ 3 - 5 triệu"), areaNumber: parseRangeFromLabel("Từ 30m - 50m") },
-    { priceNumber: parseRangeFromLabel("Trên 15 triệu"), areaNumber: parseRangeFromLabel("Trên 90m") },
+    {
+      priceNumber: parseRangeFromLabel("Từ 1 - 2 triệu"),
+      areaNumber: parseRangeFromLabel("Từ 20m - 30m"),
+    },
+    {
+      priceNumber: parseRangeFromLabel("Từ 3 - 5 triệu"),
+      areaNumber: parseRangeFromLabel("Từ 30m - 50m"),
+    },
+    {
+      priceNumber: parseRangeFromLabel("Trên 15 triệu"),
+      areaNumber: parseRangeFromLabel("Trên 90m"),
+    },
   ];
 
   for (const rangeCase of representativeRanges) {
@@ -169,7 +188,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`Smoke test passed. checked=${checked}, detailChecked=${detailChecked}`);
+  console.log(
+    `Smoke test passed. checked=${checked}, detailChecked=${detailChecked}`,
+  );
   console.log(`Report written to ${outputFile}`);
 }
 

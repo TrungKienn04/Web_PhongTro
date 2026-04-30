@@ -1,4 +1,4 @@
-import * as authService from "../services/auth";
+﻿import * as authService from "../services/auth.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PHONE_REGEX = /^0\d{8,10}$/;
@@ -122,3 +122,4 @@ export const login = async (req, res) => {
     });
   }
 };
+

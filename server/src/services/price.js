@@ -1,4 +1,4 @@
-import db from '../models'
+﻿import db from '../models/index.js'
 
 // GET ALL PRICE
 export const getPricesSerivce = () => new Promise(async (resolve, reject) => {
@@ -16,4 +16,5 @@ export const getPricesSerivce = () => new Promise(async (resolve, reject) => {
         reject(error)
     }
 })
+
 

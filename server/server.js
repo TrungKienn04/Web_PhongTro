@@ -1,13 +1,57 @@
 import express from "express";
-require("dotenv").config();
 import cors from "cors";
+import dotenv from "dotenv";
 import path from "path";
-import initRoutes from "./src/routes";
-import connectDatabase from "./src/config/connectDatabase";
-import db from "./src/models";
-import { dataPrice, dataArea } from "./src/ultis/data";
+import { fileURLToPath } from "url";
+import { Op } from "sequelize";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+import initRoutes from "./src/routes/index.js";
+import connectDatabase from "./src/config/connectDatabase.js";
+import db from "./src/models/index.js";
+import { dataPrice, dataArea } from "./src/ultis/data.js";
+import {
+  ensureBootstrapAdminUser,
+  repairLegacyPostMetadata,
+} from "./src/services/databaseMaintenance.js";
 
-const { DEFAULT_PROVINCES } = require("./src/ultis/provinceCode");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, ".env") });
+
+const {
+  DEFAULT_PROVINCES,
+  createProvinceCode,
+  extractProvinceNameFromAddress,
+} = require("./src/ultis/provinceCode");
+
+const DEFAULT_CATEGORIES = [
+  {
+    code: "CTPT",
+    value: "Cho thuê phòng trọ",
+    header: "Phòng trọ, nhà trọ",
+    subheader: "Tìm phòng trọ, nhà trọ theo khu vực và mức giá phù hợp",
+  },
+  {
+    code: "NCT",
+    value: "Nhà cho thuê",
+    header: "Nhà nguyên căn",
+    subheader: "Tổng hợp tin cho thuê nhà nguyên căn cập nhật",
+  },
+  {
+    code: "CTCH",
+    value: "Cho thuê căn hộ",
+    header: "Căn hộ, căn hộ mini",
+    subheader: "Tìm căn hộ và căn hộ mini tiện nghi, dễ lọc",
+  },
+  {
+    code: "CTMB",
+    value: "Cho thuê mặt bằng",
+    header: "Mặt bằng kinh doanh",
+    subheader: "Danh sách mặt bằng cho thuê theo khu vực nổi bật",
+  },
+];
 
 const app = express();
 const rawAllowed = (process.env.CLIENT_URL || "").toString();
@@ -33,12 +77,15 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
+app.use("/uploads", express.static(path.resolve(__dirname, "uploads")));
 
 initRoutes(app);
 
 connectDatabase().then(async () => {
   try {
+    // await db.sequelize.sync();
+    console.log("Database schema ensured.");
+
     const priceCount = await db.Price.count();
     const areaCount = await db.Area.count();
 
@@ -64,10 +111,52 @@ connectDatabase().then(async () => {
       console.log("Seeded Area table");
     }
 
+    const categoryCount = await db.Category.count();
+    if (!categoryCount) {
+      await db.Category.bulkCreate(DEFAULT_CATEGORIES);
+      console.log("Seeded default categories");
+    }
+
     const provinceCount = await db.Province.count();
     if (!provinceCount) {
       await db.Province.bulkCreate(DEFAULT_PROVINCES);
       console.log("Seeded default provinces");
+    }
+
+    const currentProvinces = await db.Province.findAll({
+      raw: true,
+      attributes: ["code", "value"],
+    });
+    const provinceMap = new Map(
+      currentProvinces.map((item) => [item.code, item.value]),
+    );
+    const postsForProvinceBackfill = await db.Post.findAll({
+      raw: true,
+      attributes: ["provinceCode", "address"],
+    });
+    const missingProvinceRecords = [];
+
+    postsForProvinceBackfill.forEach((post) => {
+      const provinceName = extractProvinceNameFromAddress(post.address || "");
+      const provinceCode =
+        post.provinceCode || createProvinceCode(provinceName);
+
+      if (!provinceCode || provinceMap.has(provinceCode)) {
+        return;
+      }
+
+      provinceMap.set(provinceCode, provinceName || provinceCode);
+      missingProvinceRecords.push({
+        code: provinceCode,
+        value: provinceName || provinceCode,
+      });
+    });
+
+    if (missingProvinceRecords.length) {
+      await db.Province.bulkCreate(missingProvinceRecords);
+      console.log(
+        `Backfilled ${missingProvinceRecords.length} provinces from posts`,
+      );
     }
 
     try {
@@ -83,7 +172,11 @@ connectDatabase().then(async () => {
       }
 
       if (!userDesc.avatar) {
-        await queryInterface.addColumn("Users", "avatar", db.Sequelize.BLOB("long"));
+        await queryInterface.addColumn(
+          "Users",
+          "avatar",
+          db.Sequelize.BLOB("long"),
+        );
         console.log("Added Users.avatar column");
       }
 
@@ -129,25 +222,31 @@ connectDatabase().then(async () => {
         console.log("Added Users.blockedReason column");
       }
 
-      await db.sequelize.query(`
-        UPDATE Users
-        SET role = 'user'
-        WHERE role IS NULL OR role = ''
-      `);
+      await db.User.update(
+        { role: "user" },
+        {
+          where: {
+            [Op.or]: [{ role: null }, { role: "" }],
+          },
+        },
+      );
 
-      await db.sequelize.query(`
-        UPDATE Users
-        SET status = 'active'
-        WHERE status IS NULL OR status = ''
-      `);
+      await db.User.update(
+        { status: "active" },
+        {
+          where: {
+            [Op.or]: [{ status: null }, { status: "" }],
+          },
+        },
+      );
 
       const userIndexes = await queryInterface.showIndex("Users");
       const hasEmailUniqueIndex = userIndexes.some(
         (index) =>
-          index.unique
-          && Array.isArray(index.fields)
-          && index.fields.length === 1
-          && index.fields[0]?.attribute === "email",
+          index.unique &&
+          Array.isArray(index.fields) &&
+          index.fields.length === 1 &&
+          index.fields[0]?.attribute === "email",
       );
 
       if (!hasEmailUniqueIndex) {
@@ -220,17 +319,24 @@ connectDatabase().then(async () => {
         console.log("Added Posts.deletedFromStatus column");
       }
 
-      await db.sequelize.query(`
-        UPDATE Posts
-        SET status = 'published'
-        WHERE status IS NULL OR status = ''
-      `);
+      await db.Post.update(
+        { status: "published" },
+        {
+          where: {
+            [Op.or]: [{ status: null }, { status: "" }],
+          },
+        },
+      );
 
-      await db.sequelize.query(`
-        UPDATE Posts
-        SET status = 'pending'
-        WHERE LOWER(status) = 'draft'
-      `);
+      await db.Post.update(
+        { status: "pending" },
+        {
+          where: db.sequelize.where(
+            db.sequelize.fn("LOWER", db.sequelize.col("status")),
+            "draft",
+          ),
+        },
+      );
 
       const postIndexes = await queryInterface.showIndex("Posts");
       const hasPostsStatusCreatedAtIndex = postIndexes.some(
@@ -248,9 +354,13 @@ connectDatabase().then(async () => {
       }
 
       if (!hasPostsUserStatusCreatedAtIndex) {
-        await queryInterface.addIndex("Posts", ["userId", "status", "createdAt"], {
-          name: "posts_user_status_created_at_idx",
-        });
+        await queryInterface.addIndex(
+          "Posts",
+          ["userId", "status", "createdAt"],
+          {
+            name: "posts_user_status_created_at_idx",
+          },
+        );
         console.log("Added Posts user/status/createdAt index");
       }
     } catch (error) {
@@ -321,6 +431,18 @@ connectDatabase().then(async () => {
         error && error.message ? error.message : error,
       );
     }
+
+    const repairSummary = await repairLegacyPostMetadata();
+    console.log(
+      "Legacy post repair summary:",
+      JSON.stringify(repairSummary, null, 2),
+    );
+
+    const adminBootstrapSummary = await ensureBootstrapAdminUser();
+    console.log(
+      "Admin bootstrap summary:",
+      JSON.stringify(adminBootstrapSummary, null, 2),
+    );
   } catch (error) {
     console.error("Seeding prices/areas failed:", error);
   }

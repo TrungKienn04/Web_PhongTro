@@ -27,11 +27,13 @@ module.exports = {
       });
     }
 
-    await queryInterface.sequelize.query(`
-      UPDATE \`Users\`
-      SET status = 'active'
-      WHERE status IS NULL OR status = ''
-    `);
+    await queryInterface.bulkUpdate(
+      "Users",
+      { status: "active" },
+      {
+        [Sequelize.Op.or]: [{ status: null }, { status: "" }],
+      },
+    );
 
     if (!postsTable.status) {
       await queryInterface.addColumn("Posts", "status", {
@@ -62,17 +64,19 @@ module.exports = {
       });
     }
 
-    await queryInterface.sequelize.query(`
-      UPDATE \`Posts\`
-      SET status = 'published'
-      WHERE status IS NULL OR status = ''
-    `);
+    await queryInterface.bulkUpdate(
+      "Posts",
+      { status: "published" },
+      {
+        [Sequelize.Op.or]: [{ status: null }, { status: "" }],
+      },
+    );
 
-    await queryInterface.sequelize.query(`
-      UPDATE \`Posts\`
-      SET status = 'pending'
-      WHERE LOWER(status) = 'draft'
-    `);
+    await queryInterface.bulkUpdate(
+      "Posts",
+      { status: "pending" },
+      Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("status")), "draft"),
+    );
 
     const userIndexes = await queryInterface.showIndex("Users");
     const hasUsersStatusRoleIndex = userIndexes.some(

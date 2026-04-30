@@ -1,4 +1,4 @@
-import * as services from '../services/price'
+﻿import * as services from '../services/price.js'
 
 export const getPrices = async (req, res) => {
     try {

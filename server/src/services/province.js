@@ -1,4 +1,4 @@
-import db from '../models'
+﻿import db from '../models/index.js'
 
 // GET ALL PROVINCE
 export const getProvincesSerivce = () => new Promise(async (resolve, reject) => {

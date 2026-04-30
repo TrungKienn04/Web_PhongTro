@@ -1,4 +1,4 @@
-import * as services from '../services/area'
+﻿import * as services from '../services/area.js'
 
 export const getAreas = async (req, res) => {
     try {

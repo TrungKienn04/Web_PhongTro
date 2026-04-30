@@ -1,4 +1,4 @@
-import db from '../models'
+﻿import db from '../models/index.js'
 
 // GET ALL AREA
 export const getAreasSerivce = () => new Promise(async (resolve, reject) => {

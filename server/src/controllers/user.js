@@ -1,12 +1,12 @@
-import * as userService from "../services/user";
-import * as postService from "../services/post";
-import * as savedPostService from "../services/savedPost";
+﻿import * as userService from "../services/user.js";
+import * as postService from "../services/post.js";
+import * as savedPostService from "../services/savedPost.js";
 
-const {
+import {
   normalizePostPayload,
   validatePostPayload,
-} = require("../ultis/postPayload");
-const { parsePostStatus } = require("../ultis/accessControl");
+} from "../ultis/postPayload.js";
+import { parsePostStatus } from "../ultis/accessControl.js";
 
 const normalizePage = (value) => {
   const parsed = Number(value);
@@ -54,7 +54,7 @@ export const getMyPosts = async (req, res) => {
       if (!normalizedStatus) {
         return res.status(400).json({
           err: 1,
-          msg: "Trạng thái bài đăng không hợp lệ.",
+          msg: "Tráº¡ng thÃ¡i bÃ i Ä‘Äƒng khÃ´ng há»£p lá»‡.",
           response: null,
         });
       }
@@ -77,7 +77,10 @@ export const getMyPosts = async (req, res) => {
 
 export const getMyPostById = async (req, res) => {
   try {
-    const response = await postService.getPostByIdService(req.params.id, req.user);
+    const response = await postService.getPostByIdService(
+      req.params.id,
+      req.user,
+    );
     return res.status(response?.err === 0 ? 200 : 404).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -96,7 +99,7 @@ export const createMyPost = async (req, res) => {
     if (!categoryCode || !title || !priceNumber || !areaNumber) {
       return res.status(400).json({
         err: 1,
-        msg: "Thiếu dữ liệu đầu vào.",
+        msg: "Thiáº¿u dá»¯ liá»‡u Ä‘áº§u vÃ o.",
         response: null,
       });
     }
@@ -133,7 +136,7 @@ export const updateMyPost = async (req, res) => {
     if (!categoryCode || !title || !priceNumber || !areaNumber) {
       return res.status(400).json({
         err: 1,
-        msg: "Thiếu dữ liệu đầu vào.",
+        msg: "Thiáº¿u dá»¯ liá»‡u Ä‘áº§u vÃ o.",
         response: null,
       });
     }
@@ -165,7 +168,10 @@ export const updateMyPost = async (req, res) => {
 
 export const deleteMyPost = async (req, res) => {
   try {
-    const response = await postService.deletePostService(req.params.id, req.user.id);
+    const response = await postService.deletePostService(
+      req.params.id,
+      req.user.id,
+    );
     return res.status(response?.err === 0 ? 200 : 400).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -181,7 +187,7 @@ export const uploadMyPostImage = async (req, res) => {
     if (!req.file?.filename) {
       return res.status(400).json({
         err: 1,
-        msg: "Không nhận được tệp ảnh hợp lệ.",
+        msg: "KhÃ´ng nháº­n Ä‘Æ°á»£c tá»‡p áº£nh há»£p lá»‡.",
         response: null,
       });
     }
@@ -209,7 +215,9 @@ export const uploadMyPostImage = async (req, res) => {
 
 export const getSavedPostIds = async (req, res) => {
   try {
-    const response = await savedPostService.getSavedPostIdsService(req.user?.id);
+    const response = await savedPostService.getSavedPostIdsService(
+      req.user?.id,
+    );
     return res.status(200).json(response);
   } catch (error) {
     return res.status(500).json({
@@ -239,7 +247,8 @@ export const toggleSavedPost = async (req, res) => {
       req.user?.id,
       req.params?.postId,
     );
-    const statusCode = response?.statusCode || (response?.err === 0 ? 200 : 400);
+    const statusCode =
+      response?.statusCode || (response?.err === 0 ? 200 : 400);
     return res.status(statusCode).json(response);
   } catch (error) {
     return res.status(500).json({

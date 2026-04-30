@@ -1,3 +1,5 @@
+// src/ultis/accessControl.js
+
 const USER_ROLE = "user";
 const ADMIN_ROLE = "admin";
 const USER_ROLES = [USER_ROLE, ADMIN_ROLE];
@@ -11,13 +13,16 @@ const POST_STATUS_PUBLISHED = "published";
 const POST_STATUS_REJECTED = "rejected";
 const POST_STATUS_HIDDEN = "hidden";
 const POST_STATUS_DELETED = "deleted";
+
 const RESTORABLE_POST_STATUSES = [
   POST_STATUS_PENDING,
   POST_STATUS_PUBLISHED,
   POST_STATUS_REJECTED,
   POST_STATUS_HIDDEN,
 ];
+
 const LEGACY_POST_STATUS_DRAFT = "draft";
+
 const POST_STATUSES = [
   POST_STATUS_PENDING,
   POST_STATUS_PUBLISHED,
@@ -25,46 +30,46 @@ const POST_STATUSES = [
   POST_STATUS_HIDDEN,
   POST_STATUS_DELETED,
 ];
+
 const ADMIN_POST_STATUS_TRANSITIONS = {
   [POST_STATUS_PENDING]: [
     POST_STATUS_PUBLISHED,
     POST_STATUS_REJECTED,
     POST_STATUS_DELETED,
   ],
-  [POST_STATUS_PUBLISHED]: [
-    POST_STATUS_HIDDEN,
-    POST_STATUS_DELETED,
-  ],
-  [POST_STATUS_REJECTED]: [
-    POST_STATUS_PENDING,
-    POST_STATUS_DELETED,
-  ],
-  [POST_STATUS_HIDDEN]: [
-    POST_STATUS_PUBLISHED,
-    POST_STATUS_DELETED,
-  ],
+  [POST_STATUS_PUBLISHED]: [POST_STATUS_HIDDEN, POST_STATUS_DELETED],
+  [POST_STATUS_REJECTED]: [POST_STATUS_PENDING, POST_STATUS_DELETED],
+  [POST_STATUS_HIDDEN]: [POST_STATUS_PUBLISHED, POST_STATUS_DELETED],
   [POST_STATUS_DELETED]: RESTORABLE_POST_STATUSES,
 };
 
+// ================= FUNCTION =================
+
 const normalizeRole = (role) => {
-  const normalized = String(role || "").trim().toLowerCase();
+  const normalized = String(role || "")
+    .trim()
+    .toLowerCase();
   return USER_ROLES.includes(normalized) ? normalized : USER_ROLE;
 };
 
 const normalizeUserStatus = (status) => {
-  const normalized = String(status || "").trim().toLowerCase();
-  return USER_STATUSES.includes(normalized)
-    ? normalized
-    : USER_STATUS_ACTIVE;
+  const normalized = String(status || "")
+    .trim()
+    .toLowerCase();
+  return USER_STATUSES.includes(normalized) ? normalized : USER_STATUS_ACTIVE;
 };
 
 const parsePostStatus = (status) => {
-  const normalized = String(status || "").trim().toLowerCase();
+  const normalized = String(status || "")
+    .trim()
+    .toLowerCase();
   return POST_STATUSES.includes(normalized) ? normalized : null;
 };
 
 const normalizePostStatus = (status, fallback = POST_STATUS_PENDING) => {
-  const normalized = String(status || "").trim().toLowerCase();
+  const normalized = String(status || "")
+    .trim()
+    .toLowerCase();
 
   if (normalized === LEGACY_POST_STATUS_DRAFT) {
     return POST_STATUS_PENDING;
@@ -74,24 +79,27 @@ const normalizePostStatus = (status, fallback = POST_STATUS_PENDING) => {
 };
 
 const isAdminRole = (role) => normalizeRole(role) === ADMIN_ROLE;
+
 const isBlockedUserStatus = (status) =>
   normalizeUserStatus(status) === USER_STATUS_BLOCKED;
+
 const isPublishedPostStatus = (status) =>
   normalizePostStatus(status, "") === POST_STATUS_PUBLISHED;
+
 const normalizeDeletedFromStatus = (status) => {
   const normalized = parsePostStatus(status);
   return RESTORABLE_POST_STATUSES.includes(normalized) ? normalized : null;
 };
+
 const canRestoreDeletedPostStatus = (deletedFromStatus, nextStatus) => {
   const restoreStatus = normalizeDeletedFromStatus(deletedFromStatus);
   const nextRestoreStatus = normalizeDeletedFromStatus(nextStatus);
 
   return Boolean(
-    restoreStatus
-    && nextRestoreStatus
-    && restoreStatus === nextRestoreStatus,
+    restoreStatus && nextRestoreStatus && restoreStatus === nextRestoreStatus,
   );
 };
+
 const canTransitionPostStatus = (currentStatus, nextStatus) => {
   const current = normalizePostStatus(currentStatus, "");
   const next = parsePostStatus(nextStatus);
@@ -101,7 +109,9 @@ const canTransitionPostStatus = (currentStatus, nextStatus) => {
   return ADMIN_POST_STATUS_TRANSITIONS[current]?.includes(next) || false;
 };
 
-module.exports = {
+// ================= EXPORT (ESM) =================
+
+export {
   ADMIN_POST_STATUS_TRANSITIONS,
   ADMIN_ROLE,
   LEGACY_POST_STATUS_DRAFT,
